@@ -47,7 +47,7 @@ def is_prime_v2(n):
         return False
 
     max_divisor = math.floor(math.sqrt(n))
-    for d in range(2, 10):
+    for d in range(2, max_divisor):
         if n % d == 0:
             return False
     return True
@@ -82,9 +82,8 @@ count = 0
 N = 50000
 t0 = time.time()
 for i in range(1, N):
-    count = count + 1 if is_prime_v2(i) == is_prime_v3(i) else count
+    is_prime_v3(i)
 t1 = time.time()
 print("Time required : ", t1 - t0)
-print((count/N) * 100);
 
 # Pseudo Prime
