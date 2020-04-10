@@ -9,7 +9,7 @@ def get_cost(path):
     return price
 
 
-class Route:
+class Train:
     def __init__(self, path, cost):
         self.path = path
         self.cost = cost
@@ -31,7 +31,7 @@ class Route:
         return ' '.join(self.path) + ' ' + str(self.cost)
 
 
-routes = []
+trains = []
 
 
 class Graph:
@@ -48,7 +48,7 @@ class Graph:
         path.append(u)
         if u == d:
             p = [index_to_place[x] for x in path]
-            routes.append(Route(p, get_cost(p)))
+            trains.append(Train(p, get_cost(p)))
         else:
             for i in self.graph[u]:
                 if not visited[i]:
@@ -93,9 +93,9 @@ for s, d in rail_cost.keys():
 g.get_path_list(place_to_index[source_stop],
                 place_to_index[destination_stop])
 
-if len(routes) == 0:
+if len(trains) == 0:
     print('No Trains')
 else:
-    routes.sort()
-    for route in routes:
+    trains.sort()
+    for route in trains:
         print(route)
