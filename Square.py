@@ -1,4 +1,5 @@
 import math
+from operator import attrgetter
 from itertools import combinations, permutations
 from PIL import ImageDraw, Image, ImagePath
 
@@ -32,7 +33,8 @@ def check(a, b, c, d):
     d2 = a - b
     d3 = a - c
     d4 = a - d
-    if d2 == d3 and d4 == math.sqrt(2) * d2:
+
+    if d2 == d3 and round(d4, 3) == round(math.sqrt(2) * d2, 3):
         if d - b == d - c:
             return True
     return False
@@ -54,11 +56,22 @@ for comb in combinations(points, 4):
         squares.append((comb[0], comb[1], comb[2], comb[3]))
 
 # Plot
-
+color = ['red', 'yellow', 'green']
+i = 0
 from matplotlib import pyplot as plt
+
 if len(squares) > 0:
     for square in squares:
         X = [pt.x for pt in square]
         Y = [pt.y for pt in square]
+        X.append(X[0])
+        Y.append(Y[0])
         plt.fill_between(X, Y)
-    plt.show()
+        i += 1
+
+        X = [pt.x for pt in points]
+        Y = [pt.y for pt in points]
+        X.append(X[0])
+        Y.append(Y[0])
+        plt.plot(X, Y, 'red')
+        plt.show()
