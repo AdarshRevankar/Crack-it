@@ -135,7 +135,6 @@ public class RailProblem{
         int cost = 0;
         for (int i = 0; i < path.size() - 1; i++) {
             String key = path.get(i) + " " + path.get(i + 1);
-            System.out.println(key);
             cost += railCost.get(key);
 
         }
