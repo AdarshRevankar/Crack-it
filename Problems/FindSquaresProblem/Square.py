@@ -1,10 +1,15 @@
 import math
-from operator import attrgetter
 from itertools import combinations, permutations
-from PIL import ImageDraw, Image, ImagePath
+from matplotlib import pyplot as plt
 
 
 class Point:
+    """
+    Point represents, point in 2D
+    Contains x and y coordinate positions
+    Comparision, toString, Subtract is overridden
+    """
+
     def __init__(self, x, y):
         self.x, self.y = x, y
 
@@ -58,7 +63,8 @@ for comb in combinations(points, 4):
 # Plot
 color = ['red', 'yellow', 'green']
 i = 0
-from matplotlib import pyplot as plt
+
+print(len(squares))
 
 if len(squares) > 0:
     for square in squares:
