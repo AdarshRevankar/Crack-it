@@ -35,6 +35,10 @@ for _ in range(N):
 
 
 def check(a, b, c, d):
+    """
+    Check the 4 points form the Square or not
+    :returns true if forms square else returns false
+    """
     d2 = a - b
     d3 = a - c
     d4 = a - d
@@ -60,12 +64,9 @@ for comb in combinations(points, 4):
     if is_square(comb[0], comb[1], comb[2], comb[3]):
         squares.append((comb[0], comb[1], comb[2], comb[3]))
 
-# Plot
-color = ['red', 'yellow', 'green']
+# Plot Squares
 i = 0
-
 print(len(squares))
-
 if len(squares) > 0:
     for square in squares:
         X = [pt.x for pt in square]
