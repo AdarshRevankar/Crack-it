@@ -1,6 +1,6 @@
 import pandas as pd
+from matplotlib import pyplot as plt
 import math
-import matplotlib.pyplot as plt
 
 '''
 Author  : Adarsh Revankar
@@ -9,11 +9,12 @@ Purpose : Computing best model for the given data
 '''
 
 # Load the data
-data = pd.read_excel('data.xlsx', dtype=float)
+data = pd.read_csv('data.csv', dtype=float)
 
 # Split
 Y = data.iloc[:, -1]
-columns = data.columns
+columns = data.columns[:-1]
+y_label = data.columns[-1]
 
 
 def compute_r(x, y):
@@ -32,35 +33,59 @@ best_r = None
 best_r_label = None
 
 # Select the best attribute
-for x_label in columns[:-1]:
+slopes_ = []
+intercepts_ = []
+threshold = 0.7
+N_attribs = len(columns)
+
+for i, x_label in zip(range(N_attribs), columns):
     X = data[x_label]
     r = compute_r(X, Y)
-    if best_r is None:
-        best_r = r
-        best_r_label = x_label
-    elif best_r < r:
-        best_r = r
-        best_r_label = x_label
-    print(f'r({x_label}) = {r}')
 
-print(f'\nBest r is "{best_r_label}" with r = {best_r}')
+    slope = (Y.std() / X.std()) * r
+    intercept = Y.mean() - slope * X.mean()
 
-# Forming the Model
-X = data[best_r_label]
+    if r >= threshold:
+        slopes_.append(slope)
+        intercepts_.append(intercept)
 
-slope = (Y.std() / X.std()) * best_r
-intercept = Y.mean() - slope * X.mean()
+    print(f'\nLinear Equation: {x_label} vs {y_label}')
+    print(f'Coefficient of Co-relation :{round(r, 2)}')
+    if intercept >= 0:
+        print(f'  Y = {round(slope, 2)} * X + {round(intercept, 2)}')
+    else:
+        print(f'  Y = {round(slope, 2)} * X {round(intercept, 2)}')
 
-print(f'\nBest fitted model using linear equation is: ')
-if intercept >= 0:
-    print(f'  Y = {slope} * X + {intercept}')
-else:
-    print(f'  Y = {slope} * X {intercept}')
+    # Plot
+    plt.subplot(int(math.ceil(N_attribs / 2)), 2, i + 1)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plot_x = pd.Series([x for x in range(int(X.min() - 5), int(X.max() + 5))])
+    plot_y = slope * plot_x + intercept
+    plt.plot(plot_x, plot_y, c='red')
+    plt.scatter(X, Y, c='blue', alpha=0.5)
 
-# Plotting
-plot_x = pd.Series([x for x in range(int(X.min() - 5), int(X.max() + 5))])
-plot_y = slope * plot_x + intercept
-
-plt.plot(plot_x, plot_y, c='red')
-plt.scatter(X, Y, c='blue')
 plt.show()
+
+'''
+=======================
+MULTI LINEAR REGRESSION
+=======================
+Since,
+y = A1 * x + B1
+y = A2 * x + B2
+y = A3 * x + B3
+...
+
+we just add all the equations
+N * y = [ A1 + A2 + ... + AN ] * x + [ B1 + B2 + ... + BN ]
+y = [ A1 + A2 + ... + AN ]/N * x + [ B1 + B2 + ... + BN ]/N
+=======================
+'''
+print('\n', '====' * 10)
+print(f'Multiple Linear Regression')
+equation = ' Y = '
+for i, s in zip(range(len(slopes_)), slopes_):
+    equation += ' ' + str(round(s / len(slopes_), 2)) + ' * X' + str(i) + ' +'
+equation += ' ( ' + str(round(sum(intercepts_) / len(slopes_))) + ' )'
+print(equation)
