@@ -1,8 +1,8 @@
 ### REGRESSION PROBLEM
 
 ### Question:
-1. Finding co-relations of attributes ( threshold = 0.7 means dont consider those attributes which gives corelation less than 70%)
-2. Finding a Linear Equation ( with multiple varying attributes of form y = b0 + b1 * x1 + ... + bn * xn For n = No. of attributes)
+1. Finding **co-relations** of attributes ( `threshold = 0.7` means dont consider those attributes which gives corelation less than 70%)
+2. Finding a **Linear Equation** ( with multiple varying attributes of form `y = b0 + b1 * x1 + ... + bn * xn` For n = No. of attributes)
 
 
 ### Solution:
