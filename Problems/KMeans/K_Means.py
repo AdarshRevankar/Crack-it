@@ -3,7 +3,6 @@ import math
 import random
 from functools import lru_cache
 from itertools import combinations
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -60,22 +59,26 @@ def print_table(distances, cls_):
 # EXECUTION
 # ===========================================================
 # Data
-data = pd.read_csv('Shirt_Cluster.csv', dtype=float)
+data = pd.read_csv('MultiData.csv', dtype=float)
 num_items = len(data)
 num_columns = len(data.columns)
 
 # K value
 k = 2
+MAX_ITERATIONS = 50
+currItr = 0
 
 # scatter plot
-show_plot(data, data.columns)
+show_plots = False
+if show_plots:
+    show_plot(data, data.columns)
 
 # Selecting Initial K Centroids
 indices = get_random_unique_indices(k, num_items)
-# indices = [6, 7]
+# indices = [4, 10]
 m = data.iloc[indices, :]
 
-while True:
+while currItr != MAX_ITERATIONS:
     # Finishing condition, prev_m
     prev_m = copy.deepcopy(m)
 
@@ -120,15 +123,19 @@ while True:
     if m.equals(prev_m):
         break
 
-    print('\n', '======' * 10, '\n\n')
+    print('======' * 10, '\n\n')
+    currItr += 1
 
 # ik ik .... i need time to get colors
-colors = ['blue', 'green', 'red', 'orange', 'cyan', 'black', 'pink', 'magenta']
-for x_col, y_col in combinations(range(len(data.columns)), 2):
-    for i in range(len(m)):
-        data_ = data.iloc[[int(x) for x in class_dict[i]], :]
-        plt.xlabel(data.columns[x_col])
-        plt.ylabel(data.columns[y_col])
-        plt.scatter(data_.iloc[:, x_col], data_.iloc[:, y_col], c=colors[i])
-    # plt.savefig('C:/image.png')
+if show_plots:
+    colors = ['blue', 'green', 'red', 'orange', 'cyan', 'black', 'pink', 'magenta']
+    j = 0
+    for x_col, y_col in combinations(range(len(data.columns)), 2):
+        plt.subplot(int(math.ceil(len(data.columns)/2)), 2, j + 1)
+        for i in range(len(m)):
+            data_ = data.iloc[[int(x) for x in class_dict[i]], :]
+            plt.xlabel(data.columns[x_col])
+            plt.ylabel(data.columns[y_col])
+            plt.scatter(data_.iloc[:, x_col], data_.iloc[:, y_col], c=colors[i])
+        j += 1
     plt.show()

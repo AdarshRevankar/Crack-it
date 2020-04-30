@@ -59,7 +59,7 @@ def compute_equation(x, y):
 
     # 6. ERROR
     squared_error = ((y - y_dash) ** 2).sum()
-    print('Error :', squared_error)
+    print('SSE :', squared_error)
 
     # B contains the equation
     print(form_equation(b))
