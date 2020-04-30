@@ -1,4 +1,5 @@
-#Crack-it
+# Crack-it
+
 Problems present in this repository are structured below
 1. **Algorithms**
     1. [All Pair Shortest Path](https://github.com/AdarshRevankar/Crack-it/blob/master/Algorithms/All_pair_shortest_path.py)
