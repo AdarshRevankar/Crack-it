@@ -3,14 +3,29 @@ import math
 import random
 from functools import lru_cache
 from itertools import combinations
-import pandas as pd
+
 import matplotlib.pyplot as plt
 import numpy as np
-
+import pandas as pd
 
 # ===========================================================
 # HELPING FUNCTIONS
 # ===========================================================
+mean = 0.
+std = 0.
+
+
+def normalize(x_data):
+    global mean, std
+    mean = x_data.mean()
+    std = x_data.std()
+    return (x_data - mean) / std
+
+
+def de_normalize(x_data):
+    return x_data * std + mean
+
+
 @lru_cache(maxsize=1000)
 def fact(n):
     if n == 0 or n == 1:
@@ -30,6 +45,7 @@ def show_plot(data, columns, clr='red', show=True):
         plt.xlabel(x_label)
         plt.ylabel(y_label)
         plt.scatter(data[x_label], data[y_label], c=clr)
+        # sns.heatmap(np.array([data[x_label].to_numpy(), data[y_label].to_numpy()]))
         subplot_index += 1
     if show:
         plt.show()
@@ -51,8 +67,8 @@ def get_random_unique_indices(k, out_bound):
 
 def print_table(distances, cls_):
     for d in distances:
-        print("{0:7.2f}".format(d), end=' ')
-    print(cls_ if cls_ is not None else ' ')
+        print("{0:15.2f}".format(d), end=' ')
+    print('M', cls_ if cls_ is not None else ' ')
 
 
 # ===========================================================
@@ -68,23 +84,32 @@ k = 2
 MAX_ITERATIONS = 50
 currItr = 0
 
+# Normalize data - for best result
+for col in data.columns:
+    data[col] = normalize(data[col])
+
 # scatter plot
-show_plots = False
+show_plots = True
 if show_plots:
     show_plot(data, data.columns)
 
 # Selecting Initial K Centroids
-indices = get_random_unique_indices(k, num_items)
-# indices = [4, 10]
+# indices = get_random_unique_indices(k, num_items)
+indices = [3, 9]
 m = data.iloc[indices, :]
 
+# Class - Clusters
+class_dict = {}
+
 while currItr != MAX_ITERATIONS:
+    print('{0:15} {1:15} {2:15}'.format("M1", "M2", "Class"))
+    print('------------------------------------------------')
+
     # Finishing condition, prev_m
     prev_m = copy.deepcopy(m)
 
     # distance from each centroid
     classes = [0] * num_items
-    class_dict = {}
     SSE = 0
     for index in range(num_items):
         row = data.iloc[index, :]
@@ -126,12 +151,15 @@ while currItr != MAX_ITERATIONS:
     print('======' * 10, '\n\n')
     currItr += 1
 
+# De normalize
+data = de_normalize(data)
+
 # ik ik .... i need time to get colors
 if show_plots:
     colors = ['blue', 'green', 'red', 'orange', 'cyan', 'black', 'pink', 'magenta']
     j = 0
-    for x_col, y_col in combinations(range(len(data.columns)), 2):
-        plt.subplot(int(math.ceil(len(data.columns)/2)), 2, j + 1)
+    for x_col, y_col in combinations(range(num_columns), 2):
+        plt.subplot(int(math.ceil(nCr(num_columns, 2) / 2.)), 2, j + 1)
         for i in range(len(m)):
             data_ = data.iloc[[int(x) for x in class_dict[i]], :]
             plt.xlabel(data.columns[x_col])
