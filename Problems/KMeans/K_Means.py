@@ -37,9 +37,6 @@ num_columns = len(data.columns)
 currItr = 0
 indices = initial_indices if initial_indices is not None else get_random_unique_indices(k, num_items)
 
-# Selecting Initial K Centroids
-m = data.iloc[indices, :].reset_index(inplace=False)
-
 # Normalize data - for best result
 z_norm = Z_Score_Normalization()
 
@@ -49,6 +46,9 @@ if is_normalized:
 # scatter plot
 if show_plots:
     show_plot(data, data.columns)
+
+# Selecting Initial K Centroids
+m = data.iloc[indices, :].reset_index(inplace=False).iloc[:, 1:]
 
 # Class - Clusters
 class_dict = {}
