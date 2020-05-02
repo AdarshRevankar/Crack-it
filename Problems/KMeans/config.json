@@ -1,0 +1,11 @@
+{
+  "normalize": false,
+  "show-plots": false,
+  "k-value": 2,
+  "data": "MultiData.csv",
+  "initial-indices": [
+    3,
+    9
+  ],
+  "MAX-ITERATIONS": 50
+}

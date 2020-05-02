@@ -1,109 +1,61 @@
 import copy
+import json
 import math
-import random
-from functools import lru_cache
 from itertools import combinations
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from Problems.KMeans.Utils import Z_Score_Normalization, print_table, nCr, show_plot, get_random_unique_indices
+
+
 # ===========================================================
 # HELPING FUNCTIONS
 # ===========================================================
-mean = 0.
-std = 0.
-
-
-def normalize(x_data):
-    global mean, std
-    mean = x_data.mean()
-    std = x_data.std()
-    return (x_data - mean) / std
-
-
-def de_normalize(x_data):
-    return x_data * std + mean
-
-
-@lru_cache(maxsize=1000)
-def fact(n):
-    if n == 0 or n == 1:
-        return 1
-    return n * fact(n - 1)
-
-
-def nCr(n, r):
-    return fact(n) / (fact(r) * fact(n - r))
-
-
-def show_plot(data, columns, clr='red', show=True):
-    num_rows = int(math.ceil(nCr(len(columns), 2) / 2.))
-    subplot_index = 1
-    for x_label, y_label in combinations(columns, 2):
-        plt.subplot(num_rows, 2, subplot_index)
-        plt.xlabel(x_label)
-        plt.ylabel(y_label)
-        plt.scatter(data[x_label], data[y_label], c=clr)
-        # sns.heatmap(np.array([data[x_label].to_numpy(), data[y_label].to_numpy()]))
-        subplot_index += 1
-    if show:
-        plt.show()
-
 
 def euclidean_distance(point1, point2):
     # Distance between 2 data points
     return (((point1 - point2) ** 2).sum()) ** 0.5
 
 
-def get_random_unique_indices(k, out_bound):
-    ind = []
-    while len(ind) != k:
-        item = random.randint(0, out_bound - 1)
-        if item not in ind:
-            ind.append(item)
-    return ind
-
-
-def print_table(distances, cls_):
-    for d in distances:
-        print("{0:15.2f}".format(d), end=' ')
-    print('M', cls_ if cls_ is not None else ' ')
-
-
 # ===========================================================
 # EXECUTION
 # ===========================================================
 # Data
-data = pd.read_csv('MultiData.csv', dtype=float)
+config = json.load(open('config.json'))
+data = pd.read_csv(config['data'])
+k = config['k-value']
+MAX_ITERATIONS = config['MAX-ITERATIONS']
+show_plots = config['show-plots']
+is_normalized = config['normalize']
+initial_indices = config['initial-indices']
+
+# Other Parameters
 num_items = len(data)
 num_columns = len(data.columns)
-
-# K value
-k = 2
-MAX_ITERATIONS = 50
 currItr = 0
-
-# Normalize data - for best result
-for col in data.columns:
-    data[col] = normalize(data[col])
-
-# scatter plot
-show_plots = True
-if show_plots:
-    show_plot(data, data.columns)
+indices = initial_indices if initial_indices is not None else get_random_unique_indices(k, num_items)
 
 # Selecting Initial K Centroids
-# indices = get_random_unique_indices(k, num_items)
-indices = [3, 9]
-m = data.iloc[indices, :]
+m = data.iloc[indices, :].reset_index(inplace=False)
+
+# Normalize data - for best result
+z_norm = Z_Score_Normalization()
+
+if is_normalized:
+    data = z_norm.fit_transform(data)
+
+# scatter plot
+if show_plots:
+    show_plot(data, data.columns)
 
 # Class - Clusters
 class_dict = {}
 
 while currItr != MAX_ITERATIONS:
-    print('{0:15} {1:15} {2:15}'.format("M1", "M2", "Class"))
-    print('------------------------------------------------')
+    print('{0:5}\t\t\t {1:5}\t\t\t {2:5}'.format("M1", "M2", "Class"))
+    print('-------------------------------------')
 
     # Finishing condition, prev_m
     prev_m = copy.deepcopy(m)
@@ -138,7 +90,7 @@ while currItr != MAX_ITERATIONS:
     # For each centroid
     pd.set_option('mode.chained_assignment', None)  # To stop getting warning message of 'CopyWarning'
     print('New Centroid :')
-    for i in range(len(m)):
+    for i in class_dict.keys():
         m.iloc[i, :] = data.iloc[[int(x) for x in class_dict[i]], :].sum() / len(class_dict[i])
         print('M' + str(i), end=' => ')
         print_table(m.iloc[i, :], None)
@@ -152,7 +104,8 @@ while currItr != MAX_ITERATIONS:
     currItr += 1
 
 # De normalize
-data = de_normalize(data)
+if is_normalized:
+    data = z_norm.de_normalize(data)
 
 # ik ik .... i need time to get colors
 if show_plots:
